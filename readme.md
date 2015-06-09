@@ -6,5 +6,5 @@ Yet another JS MVC'ish framework (client side)
 * [Template](http://github.com/arno06/Template)
 
 ##todo :
-[ ] 404 Page
-[ ] ...
+- [ ] 404 Page
+- [ ] ...
