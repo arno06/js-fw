@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>JS Framework</title>
+        <link href="assets/css/style.css" rel="stylesheet">
+        <link href='http://fonts.googleapis.com/css?family=Lato:400,900' rel='stylesheet' type='text/css'>
+        <script src="../../Dependencies/src/?need=Template"></script>
+        <script type="application/json" id="routing_rules">
+{
+    "home":
+    {
+        "hash":"home",
+        "controller":"Index",
+        "action":"defaultAction",
+        "default":true
+    },
+    "add_player":
+    {
+        "hash":"bouboup",
+        "controller":"Index",
+        "action":"secondAction"
+    }
+}
+        </script>
+        <script src="js/fw.js"></script>
+        <script>
+            FwJs.newController('Index', null, {
+                defaultAction:function()
+                {
+                    console.log("default");
+                    this.dispatchEvent(new Event(FwJs.lib.events.RENDER));
+                },
+                secondAction:function()
+                {
+                    console.log("secondAction");
+                    this.dispatchEvent(new Event(FwJs.lib.events.RENDER));
+                }
+            });
+            window.addEventListener('load', FwJs.start);
+        </script>
+    </head>
+    <body>
+        <menu>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#bouboup">Second Page</a></li>
+        </menu>
+        <div id="container"></div>
+        <div id="loader"></div>
+        <script type="html/template" id="Index_defaultAction_tpl">
+        <h1>Hello Framework</h1>
+        </script>
+        <script type="html/template" id="Index_secondAction_tpl">
+            <h1>Hell yeah</h1>
+        </script>
+    </body>
+</html>

@@ -1,0 +1,26 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Lato', sans-serif;
+}
+body menu {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto ;
+  text-align: right;
+}
+body menu li {
+  display: inline;
+}
+body menu li a {
+  display: inline-block;
+  padding: 10px;
+  text-decoration: none;
+  color: #444;
+  transition: all .3s;
+  border-bottom: solid 3px #fff;
+}
+body menu li a:hover {
+  color: #000;
+  border-bottom-color: #444444;
+}
