@@ -7,4 +7,4 @@ Yet another JS MVC'ish framework (client side)
 
 ##todo :
 - [ ] 404 Page
-- [ ] ...
+- [ ]
