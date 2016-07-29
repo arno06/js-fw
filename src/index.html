@@ -4,7 +4,7 @@
         <title>JS Framework</title>
         <link href="assets/css/style.css" rel="stylesheet">
         <link href='https://fonts.googleapis.com/css?family=Lato:400,900' rel='stylesheet' type='text/css'>
-        <script src="https://dependencies.arnaud-nicolas.fr/?need=Template"></script>
+        <script src="https://dependencies.arnaud-nicolas.fr/?need=Template,M4Tween"></script>
         <script type="application/json" id="routing_rules">
 {
     "home":
@@ -24,7 +24,29 @@
         </script>
         <script src="js/fw.js"></script>
         <script>
+            var transitions = {
+                generic:{
+                    in:function(pCtx)
+                    {
+                        var event = new Event(FwJs.lib.events.TRANSITION_IN);
+                        M4Tween.to(document.querySelector('h1'),.3, {opacity:1, marginLeft:"0px"})
+                                .onComplete(function(){
+                                    pCtx.dispatchEvent(event);
+                                });
+                    },
+                    out:function(pCtx)
+                    {
+                        var event = new Event(FwJs.lib.events.TRANSITION_OUT);
+                        M4Tween.to(document.querySelector('h1'),.3, {opacity:0, marginLeft:"-30px"})
+                                .onComplete(function(){
+                                    pCtx.dispatchEvent(event);
+                                });
+                    }
+                }
+            };
+
             FwJs.newController('Index', null, {
+                transitions:transitions,
                 defaultAction:function()
                 {
                     console.log("default");
@@ -47,10 +69,10 @@
         <div id="container"></div>
         <div id="loader"></div>
         <script type="text/template" id="Index_defaultAction_tpl">
-        <h1>Hello Framework</h1>
+        <h1 style="opacity: 0;margin-left:-30px;">Hello Framework</h1>
         </script>
         <script type="text/template" id="Index_secondAction_tpl">
-            <h1>Hell yeah</h1>
+            <h1 style="opacity: 0;margin-left:-30px;">Hell yeah</h1>
         </script>
     </body>
 </html>

@@ -5,10 +5,18 @@ var FwJs = (function(){
     var lib = {
         events:{
             RENDER:"evt_render",
-            RENDER_COMPLETE:"evt_render_complete"
+            RENDER_COMPLETE:"evt_render_complete",
+            TRANSITION_OUT:"evt_transition_out",
+            TRANSITION_IN:"evt_transition_in"
         }
     };
     var ctrl = {};
+
+    var context = {
+        controller:null,
+        action:null,
+        parameters:null
+    };
 
     function start()
     {
@@ -79,13 +87,33 @@ var FwJs = (function(){
 
     function executeContext(pController, pAction, pParameters)
     {
-        pController = pController||"Index";
-        pAction = pAction||"defaultAction";
-        pParameters = pParameters||{};
+        var newContext = {
+            controller:pController||"Index",
+            action:pAction||"defaultAction",
+            parameters:pParameters||{}
+        };
 
-        var ins = new ctrl[pController]();
-        ins.setTemplate(pController, pAction);
-        ins[pAction](pParameters);
+        var defineNewContext = function()
+        {
+            context.controller = new ctrl[newContext.controller]();
+            context.action = newContext.action;
+            context.parameters = newContext.parameters;
+            context.controller.addEventListener(TemplateEvent.RENDER_COMPLETE, function(){
+                context.controller.transitionIn(context.action);
+            });
+            context.controller.setTemplate(newContext.controller, context.action);
+            context.controller[context.action](context.parameters);
+        };
+
+        if(context && context.controller && context.action)
+        {
+            context.controller.addEventListener(lib.events.TRANSITION_OUT, defineNewContext);
+            context.controller.transitionOut(context.action);
+        }
+        else
+        {
+            defineNewContext();
+        }
     }
 
     lib.DefaultController = function()
@@ -123,6 +151,29 @@ var FwJs = (function(){
         addContent:function(pName, pValue)
         {
             this.content[pName] = pValue;
+        },
+        transitionIn:function(pAction)
+        {
+            this._transition(pAction, "in", lib.events.TRANSITION_IN);
+        },
+        transitionOut:function(pAction)
+        {
+            this._transition(pAction, "out", lib.events.TRANSITION_OUT);
+        },
+        _transition:function(pAction, pType, pEventType)
+        {
+            var event = new Event(pEventType);
+            if(!this.transitions)
+                return this.dispatchEvent(event);
+            if(this.transitions[pAction]&&this.transitions[pAction][pType])
+            {
+                return this.transitions[pAction][pType](this);
+            }
+            if (this.transitions.generic&&this.transitions.generic[pType])
+            {
+                return this.transitions.generic[pType](this);
+            }
+            return this.dispatchEvent(event);
         }
 
     });
