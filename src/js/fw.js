@@ -8,7 +8,8 @@ var FwJs = (function(){
             RENDER_COMPLETE:"evt_render_complete",
             TRANSITION_OUT:"evt_transition_out",
             TRANSITION_IN:"evt_transition_in"
-        }
+        },
+        tools:{}
     };
     var ctrl = {};
 
@@ -84,6 +85,29 @@ var FwJs = (function(){
             window.location.hash = defaultRoute;
         }
     }
+
+    lib.tools.rewriteHash = function(pIdHash, pParameters)
+    {
+        if(!routing_rules || !routing_rules[pIdHash])
+            return false;
+        var rule = routing_rules[pIdHash];
+
+        var hash = rule.hash;
+
+        for(var i in rule.parameters)
+        {
+            if(!rule.parameters.hasOwnProperty(i))
+                continue;
+            if(!pParameters.hasOwnProperty(i))
+            {
+                return false;
+            }
+
+            hash = hash.replace('{$'+i+'}', pParameters[i]);
+        }
+
+        return hash;
+    };
 
     function executeContext(pController, pAction, pParameters)
     {

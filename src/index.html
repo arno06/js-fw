@@ -19,6 +19,17 @@
         "hash":"bouboup",
         "controller":"Index",
         "action":"secondAction"
+    },
+    "withParameters":
+    {
+        "hash":"foo/{$id_bar}/{$permalink}",
+        "controller":"Index",
+        "action":"secondAction",
+        "parameters":
+        {
+            "id_bar":"[0-9]+",
+            "permalink":"[a-z0-9\\-\\_]+"
+        }
     }
 }
         </script>
@@ -52,9 +63,15 @@
                     console.log("default");
                     this.dispatchEvent(new Event(FwJs.lib.events.RENDER));
                 },
-                secondAction:function()
+                secondAction:function(pParameters)
                 {
                     console.log("secondAction");
+                    if(pParameters)
+                    {
+                        console.log(pParameters);
+
+                        console.log(FwJs.lib.tools.rewriteHash('withParameters', pParameters));
+                    }
                     this.dispatchEvent(new Event(FwJs.lib.events.RENDER));
                 }
             });
