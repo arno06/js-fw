@@ -13,7 +13,7 @@ Yet another JS MVC'ish framework (client side)
  * On render completed Event, transitionIn is called on Controller Instance
 
 ##Dependencies :
-* [Template](http://github.com/arno06/Template)
+* [Template (es6)](http://github.com/arno06/Template)
 
 ##todo :
 - [ ] 404 Page

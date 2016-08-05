@@ -1,5 +1,6 @@
-var FwJs = (function(){
+"use strict";
 
+var FwJs = (function(){
     var routing_rules = {};
     var hash;
     var lib = {
@@ -11,20 +12,13 @@ var FwJs = (function(){
         },
         tools:{}
     };
-    var ctrl = {};
+    var controllers = {};
 
     var context = {
         controller:null,
         action:null,
         parameters:null
     };
-
-    function start()
-    {
-        routing_rules = JSON.parse(document.querySelector("#routing_rules").innerHTML);
-        window.addEventListener('hashchange', routingHandler, false);
-        routingHandler();
-    }
 
     function routingHandler()
     {
@@ -35,21 +29,21 @@ var FwJs = (function(){
             return;
         }
 
-        var rule = null, r, route, idx_param, indexed_parameters, defaultRoute;
-        for(var i in routing_rules)
+        var rule = null, defaultRoute;
+        for(let i in routing_rules)
         {
             if(!routing_rules.hasOwnProperty(i))
                 continue;
-            r = routing_rules[i];
+            let r = routing_rules[i];
 
             if(r.default)
                 defaultRoute = r.hash;
 
             r.parameters = r.parameters || {};
 
-            route = r.hash.replace('\/', '\\/').replace('.', '\.');
-            indexed_parameters = [];
-            idx_param = 0;
+            let route = r.hash.replace('\/', '\\/').replace('.', '\.');
+            let indexed_parameters = [];
+            let idx_param = 0;
             for(var name in r.parameters)
             {
                 if(!r.parameters.hasOwnProperty(name))
@@ -69,7 +63,7 @@ var FwJs = (function(){
 
             var matches = hash.match(re_route);
             var parameters = [];
-            for(var k = 1, maxk = matches.length; k<maxk; k++)
+            for(let k = 1, maxk = matches.length; k<maxk; k++)
             {
                 parameters[indexed_parameters[k]] = matches[k];
             }
@@ -86,15 +80,15 @@ var FwJs = (function(){
         }
     }
 
-    lib.tools.rewriteHash = function(pIdHash, pParameters)
+    lib.tools.rewriteHash = (pIdHash, pParameters)=>
     {
         if(!routing_rules || !routing_rules[pIdHash])
             return false;
-        var rule = routing_rules[pIdHash];
+        let rule = routing_rules[pIdHash];
 
-        var hash = rule.hash;
+        let hash = rule.hash;
 
-        for(var i in rule.parameters)
+        for(let i in rule.parameters)
         {
             if(!rule.parameters.hasOwnProperty(i))
                 continue;
@@ -111,15 +105,15 @@ var FwJs = (function(){
 
     function executeContext(pController, pAction, pParameters)
     {
-        var newContext = {
+        let newContext = {
             controller:pController||"Index",
             action:pAction||"defaultAction",
             parameters:pParameters||{}
         };
 
-        var defineNewContext = function()
+        let defineNewContext = _=>
         {
-            context.controller = new ctrl[newContext.controller]();
+            context.controller = new controllers[newContext.controller]();
             context.action = newContext.action;
             context.parameters = newContext.parameters;
             context.controller.addEventListener(TemplateEvent.RENDER_COMPLETE, function(){
@@ -140,29 +134,31 @@ var FwJs = (function(){
         }
     }
 
-    lib.DefaultController = function()
+    lib.DefaultController = class extends EventEmitter
     {
-        this.removeAllEventListener();
-        this.template = "";
-        this.content = {};
-        this.addEventListener(lib.events.RENDER, this.render.proxy(this), false);
-        document.body.classList.add('loading');
-    };
-
-    Class.define(lib.DefaultController, [EventDispatcher], {
-        render:function()
+        constructor()
         {
-            var ref = this;
-            var tpl = new Template(this.template);
-            tpl.addEventListener(TemplateEvent.RENDER_COMPLETE, function(e){
+            super();
+            this.template = "";
+            this.content = {};
+            this.addEventListener(lib.events.RENDER, this.render.bind(this), false);
+            document.body.classList.add('loading');
+        }
+
+        render()
+        {
+            let tpl = new Template(this.template);
+            tpl.addEventListener(TemplateEvent.RENDER_COMPLETE, ((e)=>
+            {
                 document.querySelector('body').classList.remove('loading');
-                ref.dispatchEvent(e);
-            }, false);
+                this.dispatchEvent(new Event(TemplateEvent.RENDER_COMPLETE));
+            }).bind(this), false);
             tpl.assign('content', this.content);
             document.querySelector('#container').innerHTML = "";
             tpl.render(document.querySelector('#container'));
-        },
-        setTemplate:function(pController, pAction, pName)
+        }
+
+        setTemplate(pController, pAction, pName)
         {
             if(!pController && !pAction)
             {
@@ -171,47 +167,49 @@ var FwJs = (function(){
             }
             this.template = [pController, pAction, "tpl"].join("_");
 
-        },
-        addContent:function(pName, pValue)
+        }
+
+        addContent(pName, pValue)
         {
             this.content[pName] = pValue;
-        },
-        transitionIn:function(pAction)
+        }
+
+        transitionIn(pAction)
         {
             this._transition(pAction, "in", lib.events.TRANSITION_IN);
-        },
-        transitionOut:function(pAction)
+        }
+
+        transitionOut(pAction)
         {
             this._transition(pAction, "out", lib.events.TRANSITION_OUT);
-        },
-        _transition:function(pAction, pType, pEventType)
+        }
+
+        _transition(pAction, pType, pEventType)
         {
-            var event = new Event(pEventType);
+            let event = new Event(pEventType);
             if(!this.transitions)
                 return this.dispatchEvent(event);
             if(this.transitions[pAction]&&this.transitions[pAction][pType])
             {
-                return this.transitions[pAction][pType](this);
+                return this.transitions[pAction][pType].bind(this)();
             }
             if (this.transitions.generic&&this.transitions.generic[pType])
             {
-                return this.transitions.generic[pType](this);
+                return this.transitions.generic[pType].bind(this)();
             }
             return this.dispatchEvent(event);
         }
-
-    });
+    };
 
     return {
-        newController:function (pName, pConstruct, pPrototype, pParentController)
-        {
-            pParentController = pParentController||lib.DefaultController;
-            pConstruct = pConstruct||function(){this.super();};
-            ctrl[pName] = pConstruct;
-            Class.define(ctrl[pName], [pParentController], pPrototype);
-            return ctrl[pName];
+        start:_=>{
+            routing_rules = JSON.parse(document.querySelector("#routing_rules").innerHTML);
+            window.addEventListener('hashchange', routingHandler, false);
+            routingHandler();
         },
-        start:start,
+        newController: (pClass)=>{
+            controllers[pClass.name] = pClass;
+        },
         lib:lib
     };
 })();

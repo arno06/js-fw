@@ -4,26 +4,26 @@
         <title>JS Framework</title>
         <link href="assets/css/style.css" rel="stylesheet">
         <link href='https://fonts.googleapis.com/css?family=Lato:400,900' rel='stylesheet' type='text/css'>
-        <script src="https://dependencies.arnaud-nicolas.fr/?need=Template,M4Tween"></script>
+        <script src="https://dependencies.arnaud-nicolas.fr/?need=Template.es6,M4Tween"></script>
         <script type="application/json" id="routing_rules">
 {
     "home":
     {
         "hash":"home",
-        "controller":"Index",
+        "controller":"IndexController",
         "action":"defaultAction",
         "default":true
     },
     "bouboup":
     {
         "hash":"bouboup",
-        "controller":"Index",
+        "controller":"IndexController",
         "action":"secondAction"
     },
     "withParameters":
     {
         "hash":"foo/{$id_bar}/{$permalink}",
-        "controller":"Index",
+        "controller":"IndexController",
         "action":"secondAction",
         "parameters":
         {
@@ -35,35 +35,45 @@
         </script>
         <script src="js/fw.js"></script>
         <script>
+            "use strict";
             var transitions = {
                 generic:{
-                    in:function(pCtx)
+                    in:function()
                     {
+                        let completeHandler = function(){
+                            this.dispatchEvent(event);
+                        };
                         var event = new Event(FwJs.lib.events.TRANSITION_IN);
                         M4Tween.to(document.querySelector('h1'),.3, {opacity:1, marginLeft:"0px"})
-                                .onComplete(function(){
-                                    pCtx.dispatchEvent(event);
-                                });
+                                .onComplete(completeHandler.bind(this));
                     },
-                    out:function(pCtx)
+                    out:function()
                     {
+                        let completeHandler = function(){
+                            this.dispatchEvent(event);
+                        };
                         var event = new Event(FwJs.lib.events.TRANSITION_OUT);
                         M4Tween.to(document.querySelector('h1'),.3, {opacity:0, marginLeft:"-30px"})
-                                .onComplete(function(){
-                                    pCtx.dispatchEvent(event);
-                                });
+                                .onComplete(completeHandler.bind(this));
                     }
                 }
             };
 
-            FwJs.newController('Index', null, {
-                transitions:transitions,
-                defaultAction:function()
+            class IndexController extends FwJs.lib.DefaultController
+            {
+                constructor()
+                {
+                    super();
+                    this.transitions = transitions;
+                }
+
+                defaultAction()
                 {
                     console.log("default");
                     this.dispatchEvent(new Event(FwJs.lib.events.RENDER));
-                },
-                secondAction:function(pParameters)
+                }
+
+                secondAction(pParameters)
                 {
                     console.log("secondAction");
                     if(pParameters)
@@ -74,7 +84,10 @@
                     }
                     this.dispatchEvent(new Event(FwJs.lib.events.RENDER));
                 }
-            });
+            }
+
+            FwJs.newController(IndexController);
+
             window.addEventListener('load', FwJs.start);
         </script>
     </head>
@@ -85,10 +98,10 @@
         </menu>
         <div id="container"></div>
         <div id="loader"></div>
-        <script type="text/template" id="Index_defaultAction_tpl">
+        <script type="text/template" id="IndexController_defaultAction_tpl">
         <h1 style="opacity: 0;margin-left:-30px;">Hello Framework</h1>
         </script>
-        <script type="text/template" id="Index_secondAction_tpl">
+        <script type="text/template" id="IndexController_secondAction_tpl">
             <h1 style="opacity: 0;margin-left:-30px;">Hell yeah</h1>
         </script>
     </body>
