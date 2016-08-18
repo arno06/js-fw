@@ -34,62 +34,7 @@
 }
         </script>
         <script src="js/fw.js"></script>
-        <script>
-            "use strict";
-            var transitions = {
-                generic:{
-                    in:function()
-                    {
-                        let completeHandler = function(){
-                            this.dispatchEvent(event);
-                        };
-                        var event = new Event(FwJs.lib.events.TRANSITION_IN);
-                        M4Tween.to(document.querySelector('h1'),.3, {opacity:1, marginLeft:"0px"})
-                                .onComplete(completeHandler.bind(this));
-                    },
-                    out:function()
-                    {
-                        let completeHandler = function(){
-                            this.dispatchEvent(event);
-                        };
-                        var event = new Event(FwJs.lib.events.TRANSITION_OUT);
-                        M4Tween.to(document.querySelector('h1'),.3, {opacity:0, marginLeft:"-30px"})
-                                .onComplete(completeHandler.bind(this));
-                    }
-                }
-            };
-
-            class IndexController extends FwJs.lib.DefaultController
-            {
-                constructor()
-                {
-                    super();
-                    this.transitions = transitions;
-                }
-
-                defaultAction()
-                {
-                    console.log("default");
-                    this.dispatchEvent(new Event(FwJs.lib.events.RENDER));
-                }
-
-                secondAction(pParameters)
-                {
-                    console.log("secondAction");
-                    if(pParameters)
-                    {
-                        console.log(pParameters);
-
-                        console.log(FwJs.lib.tools.rewriteHash('withParameters', pParameters));
-                    }
-                    this.dispatchEvent(new Event(FwJs.lib.events.RENDER));
-                }
-            }
-
-            FwJs.newController(IndexController);
-
-            window.addEventListener('load', FwJs.start);
-        </script>
+        <script src="js/Main.js"></script>
     </head>
     <body>
         <menu>
@@ -99,7 +44,7 @@
         <div id="container"></div>
         <div id="loader"></div>
         <script type="text/template" id="IndexController_defaultAction_tpl">
-        <h1 style="opacity: 0;margin-left:-30px;">Hello Framework</h1>
+            <h1 style="opacity: 0;margin-left:-30px;">Hello Framework</h1>
         </script>
         <script type="text/template" id="IndexController_secondAction_tpl">
             <h1 style="opacity: 0;margin-left:-30px;">Hell yeah</h1>
