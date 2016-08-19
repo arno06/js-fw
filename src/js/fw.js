@@ -65,7 +65,7 @@ var FwJs = (function(){
             var parameters = [];
             for(let k = 1, maxk = matches.length; k<maxk; k++)
             {
-                parameters[indexed_parameters[k]] = matches[k];
+                parameters[indexed_parameters[k]] = decodeURI(matches[k]);
             }
             rule = r;
         }
@@ -97,7 +97,7 @@ var FwJs = (function(){
                 return false;
             }
 
-            hash = hash.replace('{$'+i+'}', pParameters[i]);
+            hash = hash.replace('{$'+i+'}', encodeURI(pParameters[i]));
         }
 
         return hash;
@@ -156,6 +156,11 @@ var FwJs = (function(){
             tpl.assign('content', this.content);
             document.querySelector('#container').innerHTML = "";
             tpl.render(document.querySelector('#container'));
+        }
+
+        addContent(pName, pValue)
+        {
+            this.content[pName] = pValue;
         }
 
         setTemplate(pController, pAction, pName)
