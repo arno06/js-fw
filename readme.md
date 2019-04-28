@@ -1,8 +1,10 @@
-#JS MVC Framework
+JS MVC Framework
+===
 
 Yet another JS MVC'ish framework (client side)
 
-##Request Life Cycle
+Request Life Cycle
+---
 
  * Observe changes onto hash
  * Checks routing rules, parses current hash and define next context
@@ -12,8 +14,10 @@ Yet another JS MVC'ish framework (client side)
  * On render Event, Template is parsed for rendering onto #container html element
  * On render completed Event, transitionIn is called on Controller Instance
 
-##Dependencies :
-* [Template](http://github.com/arno06/Template)
+Dependencies :
+---
+  * [Template](http://github.com/arno06/Template)
 
-##todo :
-- [ ] 404 Page
+todo :
+---
+  * [ ] 404 Page
